@@ -9,15 +9,15 @@ public class ATM {
 
     private final Card card;
 
-    public Integer withDrawMoney(Integer amount) {
+    public void withDrawMoney(Integer amount) {
         synchronized (card) {
-            return card.withdrawMoney(amount);
+            card.withdrawMoney(amount);
         }
     }
 
     public void putMoney(Integer amount) {
         synchronized (card) {
-        card.putMoney(amount);
+            card.putMoney(amount);
         }
     }
 }

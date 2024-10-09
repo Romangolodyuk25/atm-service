@@ -22,29 +22,20 @@ public class BankService {
         ExecutorService executor = Executors.newFixedThreadPool(atmList.size());
 
         for (ATM atm : atmList) {
-                Thread thread1 = new Thread(() -> atm.putMoney(amount));
-            executor.submit(thread1);
-
-            try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-
-                Thread thread = new Thread(() -> atm.withDrawMoney(amount));
-                executor.submit(thread);
+                executor.submit(() -> atm.putMoney(amount));
+                executor.submit(() -> atm.withDrawMoney(amount));
         }
 
         executor.shutdown();
         while (!executor.isTerminated()) {
             System.out.println("Задачи не завершились");
         }
-        return card.getBalance().get();
+        return card.getBalance();
     }
 
     public List<ATM> createAtms(int value, Card card) {
         List<ATM> atmList = new ArrayList<>();
-        for (int i = 0; i <= value; i++) {
+        for (int i = 0; i < value; i++) {
             atmList.add(new ATM(card));
         }
 

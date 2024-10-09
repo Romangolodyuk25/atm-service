@@ -6,43 +6,39 @@ import lombok.Data;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+
 @Data
 @AllArgsConstructor
 public class Card {
 
-    private final AtomicInteger balance;
+    private volatile AtomicInteger balance;
 
-    public Integer withdrawMoney(Integer amount) {
+    public synchronized void withdrawMoney(Integer amount) {
         System.out.println("Сумма для снятия " + amount);
         checkAmount(amount);
-        var currentBalance = balance.get();
-        var newBalance = currentBalance - amount;
 
-        if (newBalance <= 0) {
+        if (amount <= 0) {
             throw new IncorrectAmountException("There are not enough funds in the account");
         }
 
-        while (!balance.compareAndSet(currentBalance, newBalance)) {
-            currentBalance = balance.get();
-            newBalance = currentBalance - amount;
+        int currentBalance = getBalance();
+
+        if (currentBalance < amount) {
+            throw new IllegalArgumentException("Insufficient funds");
         }
+
+        balance.addAndGet(-amount);
+
 
         System.out.println("Баланс после снятия " + getBalance());
         System.out.println();
-        return balance.get();
     }
 
-    public void putMoney(Integer amount) {
+    public synchronized void putMoney(Integer amount) {
         System.out.println("Сумма для пополнения " + amount);
         checkAmount(amount);
-        var currentBalance = balance.get();
-        var newBalance = currentBalance + amount;
 
-        while (!balance.compareAndSet(currentBalance, newBalance)) {
-            currentBalance = balance.get();
-            newBalance = currentBalance + amount;
-        }
-
+        balance.addAndGet(amount);
         System.out.println("Баланс после пополнения " + getBalance());
         System.out.println();
     }
@@ -53,4 +49,7 @@ public class Card {
         }
     }
 
+    public int getBalance() {
+        return balance.get();
+    }
 }
