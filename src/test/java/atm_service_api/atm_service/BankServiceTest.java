@@ -22,7 +22,7 @@ public class BankServiceTest {
     public void shouldReturnAmount1000() {
         var card = new Card(new AtomicInteger(1000));
         var amount = 1000;
-        var atmsValue = random.nextInt(50) + 1;
+        var atmsValue = random.nextInt(100) + 1;
 
         var executorService = Executors.newFixedThreadPool(atmsValue);
         var atms = createAtms(atmsValue, card);

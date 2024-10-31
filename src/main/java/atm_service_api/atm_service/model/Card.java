@@ -17,36 +17,22 @@ public class Card {
         System.out.println("Сумма для снятия " + amount);
         checkAmount(amount);
 
-        while (true) {
-            int currentBalance = balance.get();
+        int currentBalance = balance.get();
 
-            if (currentBalance < amount) {
-                throw new IllegalArgumentException("Недостаточно средств");
-            }
-
-            int newBalance = currentBalance - amount;
-
-            if (balance.compareAndSet(currentBalance, newBalance)) {
-                System.out.println("Баланс после снятия " + getBalance());
-                System.out.println();
-                return;
-            }
+        if (currentBalance < amount || currentBalance == 0) {
+            throw new IllegalArgumentException("Недостаточно средств");
         }
+
+        balance.addAndGet(-amount);
     }
 
     public void putMoney(Integer amount) {
         System.out.println("Сумма для пополнения " + amount);
         checkAmount(amount);
 
-        while (true) {
-            int currentBalance = balance.get();
-            int newBalance = currentBalance + amount;
-            if (balance.compareAndSet(currentBalance, newBalance)) {
-                System.out.println("Баланс после пополнения " + getBalance());
-                System.out.println();
-                return;
-            }
-        }
+        balance.addAndGet(amount);
+        System.out.println("Баланс после пополнения " + getBalance());
+        System.out.println();
     }
 
     private void checkAmount(Integer amount) {
