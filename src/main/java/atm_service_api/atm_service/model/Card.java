@@ -11,9 +11,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 @AllArgsConstructor
 public class Card {
 
-    private volatile AtomicInteger balance;
+    private final AtomicInteger balance;
 
-    public synchronized void withdrawMoney(Integer amount) {
+    public void withdrawMoney(Integer amount) {
         System.out.println("Сумма для снятия " + amount);
         checkAmount(amount);
 
@@ -25,7 +25,6 @@ public class Card {
             }
 
             int newBalance = currentBalance - amount;
-//            balance.addAndGet(-amount);
 
             if (balance.compareAndSet(currentBalance, newBalance)) {
                 System.out.println("Баланс после снятия " + getBalance());
@@ -35,14 +34,13 @@ public class Card {
         }
     }
 
-    public synchronized void putMoney(Integer amount) {
+    public void putMoney(Integer amount) {
         System.out.println("Сумма для пополнения " + amount);
         checkAmount(amount);
 
         while (true) {
             int currentBalance = balance.get();
             int newBalance = currentBalance + amount;
-//            balance.addAndGet(amount);
             if (balance.compareAndSet(currentBalance, newBalance)) {
                 System.out.println("Баланс после пополнения " + getBalance());
                 System.out.println();
