@@ -17,30 +17,38 @@ public class Card {
         System.out.println("Сумма для снятия " + amount);
         checkAmount(amount);
 
-        if (amount <= 0) {
-            throw new IncorrectAmountException("There are not enough funds in the account");
+        while (true) {
+            int currentBalance = balance.get();
+
+            if (currentBalance < amount) {
+                throw new IllegalArgumentException("Недостаточно средств");
+            }
+
+            int newBalance = currentBalance - amount;
+//            balance.addAndGet(-amount);
+
+            if (balance.compareAndSet(currentBalance, newBalance)) {
+                System.out.println("Баланс после снятия " + getBalance());
+                System.out.println();
+                return;
+            }
         }
-
-        int currentBalance = getBalance();
-
-        if (currentBalance < amount) {
-            throw new IllegalArgumentException("Insufficient funds");
-        }
-
-        balance.addAndGet(-amount);
-
-
-        System.out.println("Баланс после снятия " + getBalance());
-        System.out.println();
     }
 
     public synchronized void putMoney(Integer amount) {
         System.out.println("Сумма для пополнения " + amount);
         checkAmount(amount);
 
-        balance.addAndGet(amount);
-        System.out.println("Баланс после пополнения " + getBalance());
-        System.out.println();
+        while (true) {
+            int currentBalance = balance.get();
+            int newBalance = currentBalance + amount;
+//            balance.addAndGet(amount);
+            if (balance.compareAndSet(currentBalance, newBalance)) {
+                System.out.println("Баланс после пополнения " + getBalance());
+                System.out.println();
+                return;
+            }
+        }
     }
 
     private void checkAmount(Integer amount) {
