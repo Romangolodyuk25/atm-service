@@ -46,7 +46,10 @@ public class BankServiceTest {
     private List<ATM> createAtms(int value, Card card) {
         List<ATM> atmList = new ArrayList<>();
         for (int i = 0; i < value; i++) {
-            atmList.add(new ATM(card));
+            ATM atm = new ATM();
+            atm.insertCard(card);
+            atmList.add(atm);
+//            atmList.add(new ATM(card));
         }
 
         return atmList;

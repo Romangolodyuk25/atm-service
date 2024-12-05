@@ -5,34 +5,49 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 @Data
 @AllArgsConstructor
 public class Card {
 
+    private final ReentrantLock lock = new ReentrantLock();
     private final AtomicInteger balance;
 
     public void withdrawMoney(Integer amount) {
-        System.out.println("Сумма для снятия " + amount);
-        checkAmount(amount);
+        lock.lock();
+        try {
+            System.out.println("Сумма для снятия " + amount);
+            checkAmount(amount);
 
-        int currentBalance = balance.get();
+            int currentBalance = balance.get();
 
-        if (currentBalance < amount || currentBalance == 0) {
-            throw new IllegalArgumentException("Недостаточно средств");
+            if (currentBalance < amount || currentBalance == 0) {
+                throw new IllegalArgumentException("Недостаточно средств");
+            }
+
+            balance.addAndGet(-amount);
+            System.out.println("Баланс после снятия " + getBalance());
+            System.out.println();
+        } finally {
+            lock.unlock();
         }
 
-        balance.addAndGet(-amount);
     }
 
     public void putMoney(Integer amount) {
-        System.out.println("Сумма для пополнения " + amount);
-        checkAmount(amount);
+        lock.lock();
+        try {
+            System.out.println("Сумма для пополнения " + amount);
+            checkAmount(amount);
 
-        balance.addAndGet(amount);
-        System.out.println("Баланс после пополнения " + getBalance());
-        System.out.println();
+            balance.addAndGet(amount);
+            System.out.println("Баланс после пополнения " + getBalance());
+            System.out.println();
+        } finally {
+            lock.unlock();
+        }
     }
 
     private void checkAmount(Integer amount) {
